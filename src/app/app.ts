@@ -1,33 +1,33 @@
-// src/app/app.component.ts
-
+import { NgIf } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MsalService } from '@azure/msal-angular';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, NgIf],
   templateUrl: './app.html',
   styleUrls: ['./app.css']
 })
 export class App implements OnInit {
   isLoggedIn = false;
+  username = '';
 
   protected readonly title = signal('encrypteddb-client');
 
   constructor(private msalService: MsalService) {}
 
-  ngOnInit() {
+  async ngOnInit() {
+    await this.msalService.instance.initialize();
     this.checkLoginStatus();
   }
 
   checkLoginStatus() {
-    // Check for an active account
     this.isLoggedIn = this.msalService.instance.getAllAccounts().length > 0;
+    this.username = this.msalService.instance.getAllAccounts()[0].username
   }
 
   login() {
-    // Uses the Redirect flow (recommended)
     this.msalService.loginRedirect();
   }
 
@@ -36,15 +36,3 @@ export class App implements OnInit {
   }
 }
 
-// import { Component, signal } from '@angular/core';
-// import { RouterOutlet } from '@angular/router';
-
-// @Component({
-//   selector: 'app-root',
-//   imports: [RouterOutlet],
-//   templateUrl: './app.html',
-//   styleUrl: './app.css'
-// })
-// export class App {
-//   protected readonly title = signal('encrypteddb-client');
-// }

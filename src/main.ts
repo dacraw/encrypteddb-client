@@ -1,10 +1,8 @@
-// src/main.ts
-
 import { bootstrapApplication } from '@angular/platform-browser';
 import { App } from './app/app';
 import { provideRouter } from '@angular/router';
-import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptors } from '@angular/common/http';
-import { routes } from './app/app.routes'; // Assuming you have an app.routes.ts file
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { routes } from './app/app.routes'; 
 
 import {
   MsalService,
@@ -24,7 +22,6 @@ import {
 } from '@azure/msal-browser';
 import { msalConfig, loginRequest, protectedResources } from './app/auth-config'; // Assuming you kept the config in auth-config.ts
 
-// --- MSAL Factory Functions (Same as before) ---
 
 export function MSALInstanceFactory(): IPublicClientApplication {
   return new PublicClientApplication(msalConfig);
@@ -40,31 +37,31 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
 export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
   const protectedResourceMap = new Map<string, Array<string>>();
 
-  // Map your protected API endpoints and their required scopes
   protectedResourceMap.set(
     protectedResources.graphMe.endpoint,
     protectedResources.graphMe.scopes
   );
 
+  protectedResourceMap.set(
+    protectedResources.encryptedApi.endpoint,
+    protectedResources.encryptedApi.scopes
+  );
+
   return {
-    interactionType: InteractionType.Redirect, // Or Popup
+    interactionType: InteractionType.Redirect,
     protectedResourceMap,
   };
 }
 
 bootstrapApplication(App, {
   providers: [
-    // 1. Core Angular providers
+
     provideRouter(routes),
-    // Use withInterceptors() to provide the MsalInterceptor
+
     provideHttpClient(
-      withInterceptors([
-        // This is where you would include the MsalInterceptor, but MSAL has its own
-        // implementation using HTTP_INTERCEPTORS which is simpler to use here.
-      ])
+      withInterceptorsFromDi()
     ),
 
-    // 2. MSAL Instance and Config Providers
     {
       provide: MSAL_INSTANCE,
       useFactory: MSALInstanceFactory,
@@ -78,13 +75,10 @@ bootstrapApplication(App, {
       useFactory: MSALInterceptorConfigFactory,
     },
 
-    // 3. MSAL Services (Provided at the root level)
     MsalService,
     MsalGuard,
     MsalBroadcastService,
 
-    // 4. MsalInterceptor (The Interceptor needs to be provided separately)
-    // In Angular Standalone, providing the interceptor requires this format.
     {
       provide: HTTP_INTERCEPTORS,
       useClass: MsalInterceptor,
@@ -92,10 +86,3 @@ bootstrapApplication(App, {
     },
   ],
 }).catch(err => console.error(err));
-
-// import { bootstrapApplication } from '@angular/platform-browser';
-// import { appConfig } from './app/app.config';
-// import { App } from './app/app';
-
-// bootstrapApplication(App, appConfig)
-//   .catch((err) => console.error(err));

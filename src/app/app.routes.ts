@@ -1,14 +1,8 @@
-// src/app/app.routes.ts
-
 import { Routes } from '@angular/router';
 import { MsalGuard } from '@azure/msal-angular';
-// import { HomeComponent } from './home/home.component';
-// import { ProfileComponent } from './profile/profile.component';
+import { Home } from './home/home';
 
 export const routes: Routes = [
-  { path: '', canActivate: [MsalGuard] },
+  { path: '', canActivate: [MsalGuard], component: Home },
 ];
 
-// import { Routes } from '@angular/router';
-
-// export const routes: Routes = [];
