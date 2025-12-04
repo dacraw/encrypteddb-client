@@ -1,3 +1,8 @@
+# Purpose
+This is a simple frontend app with Entra ID authentication for use with a backend that pings Azure Key Vault and returns a value if the user is authenticated to view the secret.
+
+
+
 # EncrypteddbClient
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.8.
